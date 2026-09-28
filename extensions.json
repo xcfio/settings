@@ -1,0 +1,31 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=827846 to learn about workspace recommendations.
+    // Extension identifier format: ${publisher}.${name}. Example: vscode.csharp
+
+    "recommendations": [
+        "adpyke.codesnap",
+        "arktypeio.arkdark",
+        "bradlc.vscode-tailwindcss",
+        "codediagram.codediagram",
+        "enkia.tokyo-night",
+        "esbenp.prettier-vscode",
+        "expo.vscode-expo-tools",
+        "floookay.vscode-wpm-monitor",
+        "formulahendry.code-runner",
+        "github.codespaces",
+        "github.vscode-github-actions",
+        "leonardssh.vscord",
+        "meganrogge.template-string-converter",
+        "miguelsolorio.symbols",
+        "ms-vscode.live-server",
+        "oxc.oxc-vscode",
+        "pflannery.vscode-versionlens",
+        "quicktype.quicktype",
+        "streetsidesoftware.code-spell-checker",
+        "typescriptteam.native-preview",
+        "unifiedjs.vscode-mdx",
+        "usernamehw.errorlens",
+        "vivaxy.vscode-conventional-commits",
+        "yoavbls.pretty-ts-errors"
+    ]
+}

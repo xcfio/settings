@@ -1,0 +1,33 @@
+{
+    "name": "settings",
+    "homepage": "https://github.com/xcfio/settings#readme",
+    "license": "MIT",
+    "version": "0.0.0",
+    "author": {
+        "name": "xcfio",
+        "email": "xcfio@proton.me",
+        "url": "https://xcfio.com"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/xcfio/settings"
+    },
+    "bugs": {
+        "url": "https://github.com/xcfio/settings/issues",
+        "email": "xcfio@proton.me"
+    },
+    "packageManager": "pnpm@12.6.0",
+    "devDependencies": {
+        "@commitlint/config-conventional": "^21.2.3",
+        "@commitlint/format": "^21.2.3",
+        "@commitlint/types": "^21.2.3",
+        "commitlint": "^21.2.3",
+        "lefthook": "^2.1.14",
+        "oxlint": "^1.86.0",
+        "oxlint-plugin-eslint": "^1.86.0",
+        "oxlint-tsgolint": "^7.0.2003",
+        "prettier": "^3.9.9",
+        "turbo": "^2.11.5",
+        "typescript": "7.0.2"
+    }
+}

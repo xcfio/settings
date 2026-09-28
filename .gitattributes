@@ -1,0 +1,8 @@
+# JSON
+*.json linguist-detectable=true
+
+# XML
+*.xml linguist-detectable=false
+
+# HTML
+*.html linguist-detectable=false
