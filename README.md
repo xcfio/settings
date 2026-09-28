@@ -8,6 +8,7 @@ Personal development environment settings and configs for my projects.
 
 - [Quick start](#quick-start-powershell)
     - [How to open PowerShell](#how-to-open-powershell)
+    - [Install](#install)
 - [Manual copy method](#manual-copy-method)
 - [Uninstall](#uninstall-powershell)
 - [Prerequisites](#prerequisites)
@@ -19,12 +20,6 @@ Personal development environment settings and configs for my projects.
 - [Resources](#resources)
 
 ## Quick start (PowerShell)
-
-Run inside your project folder:
-
-```powershell
-iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
-```
 
 ### How to open PowerShell
 
@@ -38,6 +33,14 @@ If you need to open PowerShell in your project folder, you can use any of the fo
 - **Start Menu**: Press the <kbd>Win</kbd> key, type `PowerShell`, and hit <kbd>Enter</kbd>.
 
 > **Tip:** To run as Administrator, press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> from the Run dialog, or right-click PowerShell and choose **Run as administrator**.
+
+### Install
+
+Run inside your project folder:
+
+```powershell
+iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
+```
 
 What [install.ps1](./install.ps1) does:
 

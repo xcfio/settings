@@ -8,6 +8,7 @@
 
 - [কুইক স্টার্ট](#কুইক-স্টার্ট-powershell)
   - [PowerShell খোলার নিয়ম](#powershell-খোলার-নিয়ম)
+  - [ইনস্টল (Install)](#ইনস্টল-install)
 - [ম্যানুয়াল কপি পদ্ধতি](#ম্যানুয়াল-কপি-পদ্ধতি)
 - [আনইনস্টল](#আনইনস্টল-powershell)
 - [প্রয়োজনীয় শর্তাবলী (Prerequisites)](#প্রয়োজনীয়-শর্তাবলী-prerequisites)
@@ -19,12 +20,6 @@
 - [রিসোর্স (Resources)](#রিসোর্স-resources)
 
 ## কুইক স্টার্ট (PowerShell)
-
-আপনার প্রজেক্ট ফোল্ডারের ভেতরে রান করুন:
-
-```powershell
-iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
-```
 
 ### PowerShell খোলার নিয়ম
 
@@ -38,6 +33,14 @@ iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
 - **স্টার্ট মেনু**: কীবোর্ডে <kbd>Win</kbd> কী চাপুন, `PowerShell` লিখে সার্চ করে <kbd>Enter</kbd> চাপুন।
 
 > **টিপস:** অ্যাডমিনিস্ট্রেটর হিসেবে চালাতে চাইলে রান ডায়ালগে কমান্ড টাইপ করে <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> চাপুন অথবা রাইট-ক্লিক করে "Run as administrator" বেছে নিন।
+
+### ইনস্টল (Install)
+
+আপনার প্রজেক্ট ফোল্ডারের ভেতরে রান করুন:
+
+```powershell
+iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
+```
 
 [install.ps1](./install.ps1) যা যা করে:
 
