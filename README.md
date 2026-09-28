@@ -2,11 +2,12 @@
 
 [English](README.md) | [বাংলা](README.bn.md)
 
-Personal dev environment config: VS Code, Prettier, oxlint, TypeScript, and monorepo tooling.
+Personal development environment settings and configs for my projects.
 
 ## Contents
 
 - [Quick start](#quick-start-powershell)
+    - [How to open PowerShell](#how-to-open-powershell)
 - [Manual copy method](#manual-copy-method)
 - [Uninstall](#uninstall-powershell)
 - [Prerequisites](#prerequisites)
@@ -24,6 +25,19 @@ Run inside your project folder:
 ```powershell
 iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
 ```
+
+### How to open PowerShell
+
+If you need to open PowerShell in your project folder, you can use any of the following methods on Windows:
+
+- **Run Dialog (`Win + R`)**: Press <kbd>Win</kbd> + <kbd>R</kbd>, type `powershell` (or `pwsh`), and press <kbd>Enter</kbd>. Then navigate to your project using `cd path/to/your-project`.
+- **File Explorer address bar (Fastest)**: Open your project folder in Windows File Explorer, click the address bar (or press <kbd>Alt</kbd> + <kbd>D</kbd>), type `powershell` or `pwsh`, and press <kbd>Enter</kbd> to open directly in that folder.
+- **Right-click context menu**: Inside your project folder, right-click an empty space (or hold <kbd>Shift</kbd> and right-click) and select **Open in Terminal** or **Open PowerShell window here**.
+- **Power User Menu (`Win + X`)**: Press <kbd>Win</kbd> + <kbd>X</kbd> and choose **Terminal** or **Windows PowerShell**.
+- **VS Code integrated terminal**: Open your project in VS Code and press <kbd>Ctrl</kbd> + <kbd>`</kbd> (backtick), or go to **Terminal** > **New Terminal**.
+- **Start Menu**: Press the <kbd>Win</kbd> key, type `PowerShell`, and hit <kbd>Enter</kbd>.
+
+> **Tip:** To run as Administrator, press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> from the Run dialog, or right-click PowerShell and choose **Run as administrator**.
 
 What [install.ps1](./install.ps1) does:
 
@@ -57,61 +71,62 @@ If you prefer to copy or download files individually without running the automat
 ### Option A: From a cloned repository
 
 1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/xcfio/settings.git
-   cd settings
-   ```
+
+    ```bash
+    git clone https://github.com/xcfio/settings.git
+    cd settings
+    ```
 
 2. **Copy global VS Code settings:**
-   - **Windows (PowerShell):**
-     ```powershell
-     Copy-Item settings.json "$env:APPDATA\Code\User\settings.json" -Force
-     ```
-   - **macOS:**
-     ```bash
-     cp settings.json "$HOME/Library/Application Support/Code/User/settings.json"
-     ```
-   - **Linux:**
-     ```bash
-     cp settings.json "$HOME/.config/Code/User/settings.json"
-     ```
+    - **Windows (PowerShell):**
+        ```powershell
+        Copy-Item settings.json "$env:APPDATA\Code\User\settings.json" -Force
+        ```
+    - **macOS:**
+        ```bash
+        cp settings.json "$HOME/Library/Application Support/Code/User/settings.json"
+        ```
+    - **Linux:**
+        ```bash
+        cp settings.json "$HOME/.config/Code/User/settings.json"
+        ```
 
 3. **Install recommended extensions:**
-   - **PowerShell:**
-     ```powershell
-     (Get-Content extensions.json -Raw) -replace '(?m)^\s*//.*$', '' | ConvertFrom-Json |
-         Select-Object -ExpandProperty recommendations | ForEach-Object { code --install-extension $_ }
-     ```
-   - **Bash:**
-     ```bash
-     grep -o '"[^"]*"' extensions.json | grep '\.' | tr -d '"' | xargs -L 1 code --install-extension
-     ```
+    - **PowerShell:**
+        ```powershell
+        (Get-Content extensions.json -Raw) -replace '(?m)^\s*//.*$', '' | ConvertFrom-Json |
+            Select-Object -ExpandProperty recommendations | ForEach-Object { code --install-extension $_ }
+        ```
+    - **Bash:**
+        ```bash
+        grep -o '"[^"]*"' extensions.json | grep '\.' | tr -d '"' | xargs -L 1 code --install-extension
+        ```
 
 4. **Copy project configuration files to your project folder:**
-   - **PowerShell:**
-     ```powershell
-     $target = "path/to/your-project"
-     Copy-Item .prettierrc, .gitattributes, .gitignore, oxlint.config.mts "$target/"
-     New-Item -ItemType Directory -Path "$target/.vscode" -Force | Out-Null
-     Copy-Item .vscode/settings.json "$target/.vscode/settings.json"
-     ```
-   - **Bash:**
-     ```bash
-     TARGET="path/to/your-project"
-     cp .prettierrc .gitattributes .gitignore oxlint.config.mts "$TARGET/"
-     mkdir -p "$TARGET/.vscode"
-     cp .vscode/settings.json "$TARGET/.vscode/settings.json"
-     ```
+    - **PowerShell:**
+        ```powershell
+        $target = "path/to/your-project"
+        Copy-Item .prettierrc, .gitattributes, .gitignore, oxlint.config.mts "$target/"
+        New-Item -ItemType Directory -Path "$target/.vscode" -Force | Out-Null
+        Copy-Item .vscode/settings.json "$target/.vscode/settings.json"
+        ```
+    - **Bash:**
+        ```bash
+        TARGET="path/to/your-project"
+        cp .prettierrc .gitattributes .gitignore oxlint.config.mts "$TARGET/"
+        mkdir -p "$TARGET/.vscode"
+        cp .vscode/settings.json "$TARGET/.vscode/settings.json"
+        ```
 
 5. **Copy TypeScript template (pick one):**
-   - **Backend / Node.js:**
-     ```powershell
-     Copy-Item tsconfig-backend.json "path/to/your-project/tsconfig.json"
-     ```
-   - **Frontend / React:**
-     ```powershell
-     Copy-Item tsconfig-fronend.json "path/to/your-project/tsconfig.json"
-     ```
+    - **Backend / Node.js:**
+        ```powershell
+        Copy-Item tsconfig-backend.json "path/to/your-project/tsconfig.json"
+        ```
+    - **Frontend / React:**
+        ```powershell
+        Copy-Item tsconfig-fronend.json "path/to/your-project/tsconfig.json"
+        ```
 
 ### Option B: Download individually via PowerShell (inside your project folder)
 

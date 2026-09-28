@@ -2,11 +2,12 @@
 
 [English](README.md) | [বাংলা](README.bn.md)
 
-ব্যক্তিগত ডেভেলপমেন্ট এনভায়রনমেন্ট কনফিগারেশন: VS Code, Prettier, oxlint, TypeScript, এবং monorepo টুলিং।
+আমার প্রজেক্টের জন্য ব্যক্তিগত ডেভেলপমেন্ট পরিবেশের সেটিংস এবং কনফিগারেশন।
 
 ## সূচিপত্র (Contents)
 
 - [কুইক স্টার্ট](#কুইক-স্টার্ট-powershell)
+  - [PowerShell খোলার নিয়ম](#powershell-খোলার-নিয়ম)
 - [ম্যানুয়াল কপি পদ্ধতি](#ম্যানুয়াল-কপি-পদ্ধতি)
 - [আনইনস্টল](#আনইনস্টল-powershell)
 - [প্রয়োজনীয় শর্তাবলী (Prerequisites)](#প্রয়োজনীয়-শর্তাবলী-prerequisites)
@@ -24,6 +25,19 @@
 ```powershell
 iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
 ```
+
+### PowerShell খোলার নিয়ম
+
+প্রজেক্ট ফোল্ডারে PowerShell ওপেন করার জন্য Windows-এ নিচের যেকোনো পদ্ধতি ব্যবহার করতে পারেন:
+
+- **রান ডায়ালগ (`Win + R`)**: কীবোর্ডে <kbd>Win</kbd> + <kbd>R</kbd> চাপুন, `powershell` (অথবা `pwsh`) লিখে <kbd>Enter</kbd> চাপুন। এরপর প্রজেক্ট ফোল্ডারে যেতে `cd path/to/your-project` লিখুন।
+- **ফাইল এক্সপ্লোরার অ্যাড্রেস বার (সবচেয়ে সহজ)**: ফাইল এক্সপ্লোরারে প্রজেক্ট ফোল্ডারটি ওপেন করুন, উপরের অ্যাড্রেস বারে ক্লিক করুন (অথবা <kbd>Alt</kbd> + <kbd>D</kbd> চাপুন), `powershell` বা `pwsh` লিখে <kbd>Enter</kbd> চাপুন। সরাসরি ওই ফোল্ডারেই PowerShell চালু হবে।
+- **রাইট-ক্লিক কনটেক্সট মেনু**: প্রজেক্ট ফোল্ডারের খালি জায়গায় রাইট-ক্লিক করুন (অথবা <kbd>Shift</kbd> চেপে রাইট-ক্লিক করুন) এবং **Open in Terminal** বা **Open PowerShell window here** নির্বাচন করুন।
+- **পাওয়ার ইউজার মেনু (`Win + X`)**: কীবোর্ডে <kbd>Win</kbd> + <kbd>X</kbd> চাপুন এবং তালিকা থেকে **Terminal** বা **Windows PowerShell** বেছে নিন।
+- **VS Code টার্মিনাল**: VS Code-এ প্রজেক্ট ফোল্ডার ওপেন থাকলে <kbd>Ctrl</kbd> + <kbd>`</kbd> (ব্যাকটিক) চাপুন অথবা মেনু থেকে **Terminal** > **New Terminal**-এ যান।
+- **স্টার্ট মেনু**: কীবোর্ডে <kbd>Win</kbd> কী চাপুন, `PowerShell` লিখে সার্চ করে <kbd>Enter</kbd> চাপুন।
+
+> **টিপস:** অ্যাডমিনিস্ট্রেটর হিসেবে চালাতে চাইলে রান ডায়ালগে কমান্ড টাইপ করে <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Enter</kbd> চাপুন অথবা রাইট-ক্লিক করে "Run as administrator" বেছে নিন।
 
 [install.ps1](./install.ps1) যা যা করে:
 
