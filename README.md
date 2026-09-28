@@ -1,5 +1,7 @@
 # Settings
 
+[English](README.md) | [বাংলা](README.bn.md)
+
 Personal dev environment config: VS Code, Prettier, oxlint, TypeScript, and monorepo tooling.
 
 ## Contents
