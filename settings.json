@@ -55,7 +55,8 @@
     "security.workspace.trust.untrustedFiles": "open",
     "codesnap.showWindowControls": false,
     "codesnap.backgroundColor": "#6495ED",
-    "workbench.colorTheme": "Tokyo Night Dark",
+    "workbench.colorTheme": "GitHub Dark Default",
+    "workbench.iconTheme": "symbols",
     "yaml.format.printWidth": 120,
     "workbench.browser.openLocalhostLinks": false,
     "terminal.integrated.defaultProfile.linux": "fish",
@@ -80,7 +81,9 @@
         "*": false
     },
     "editor.quickSuggestions": {
-        "strings": "on"
+        "comments": "on",
+        "strings": "on",
+        "other": "on"
     },
     "files.associations": {
         "*.css": "tailwindcss",
