@@ -55,7 +55,7 @@
     "security.workspace.trust.untrustedFiles": "open",
     "codesnap.showWindowControls": false,
     "codesnap.backgroundColor": "#6495ED",
-    "workbench.colorTheme": "Tokyo Night Storm",
+    "workbench.colorTheme": "Tokyo Night Dark",
     "yaml.format.printWidth": 120,
     "workbench.browser.openLocalhostLinks": false,
     "terminal.integrated.defaultProfile.linux": "fish",
