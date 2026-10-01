@@ -55,7 +55,7 @@
     "security.workspace.trust.untrustedFiles": "open",
     "codesnap.showWindowControls": false,
     "codesnap.backgroundColor": "#6495ED",
-    "workbench.colorTheme": "Dark Modern",
+    "workbench.colorTheme": "Tokyo Night Storm",
     "yaml.format.printWidth": 120,
     "workbench.browser.openLocalhostLinks": false,
     "terminal.integrated.defaultProfile.linux": "fish",
@@ -63,6 +63,22 @@
     "workbench.layoutControl.enabled": false,
     "window.commandCenter": true,
     "terminal.integrated.mouseWheelScrollSensitivity": 3,
+    "[java]": {
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "Oracle.oracle-java"
+    },
+    "cSpell.enabledFileTypes": {
+        "*": true,
+        "yaml": true,
+        "csv": true,
+        "github-actions-workflow": true,
+        "mdx": true,
+        "jsonc": false
+    },
+    "jdk.telemetry.enabled": false,
+    "github.copilot.enable": {
+        "*": false
+    },
     "editor.quickSuggestions": {
         "strings": "on"
     },
@@ -87,7 +103,7 @@
     "code-runner.executorMap": {
         "javascript": "node --watch",
         "typescript": "tsx watch",
-        "java": "cd $dir && javac $fileName && java $fileNameWithoutExt",
+        "java": "java",
         "c": "cd $dir && gcc $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
         "zig": "zig run",
         "cpp": "cd $dir && g++ $fileName -o $fileNameWithoutExt && $dir$fileNameWithoutExt",
