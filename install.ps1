@@ -342,7 +342,7 @@ if ($TsConfig -eq "backend") {
             Copy-Item -Path $tsconfigDest -Destination "$tsconfigDest.bak" -Force
             Write-Host "  [+] Backed up existing tsconfig.json to tsconfig.json.bak" -ForegroundColor DarkGray
         }
-        Download-File -Url "$BaseUrl/tsconfig-fronend.json" -OutPath $tsconfigDest
+        Download-File -Url "$BaseUrl/tsconfig-frontend.json" -OutPath $tsconfigDest
         Write-Host "  [+] Configured TypeScript frontend (React/DOM): tsconfig.json" -ForegroundColor Green
     } catch {
         Write-Host "  [x] Failed to download frontend tsconfig: $_" -ForegroundColor Red

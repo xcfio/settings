@@ -39,7 +39,7 @@ If you need to open PowerShell in your project folder, you can use any of the fo
 Run inside your project folder:
 
 ```powershell
-iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
 ```
 
 What [install.ps1](./install.ps1) does:
@@ -54,8 +54,8 @@ Optional tsconfig (or run `.\install.ps1 -TsConfig backend` / `frontend`):
 
 ```powershell
 $base = "https://raw.githubusercontent.com/xcfio/settings/main"
-iwr "$base/tsconfig-backend.json" -OutFile tsconfig.json
-iwr "$base/tsconfig-fronend.json" -OutFile tsconfig.json
+irm "$base/tsconfig-backend.json" -OutFile tsconfig.json
+irm "$base/tsconfig-frontend.json" -OutFile tsconfig.json
 ```
 
 Optional dev tooling:
@@ -128,7 +128,7 @@ If you prefer to copy or download files individually without running the automat
         ```
     - **Frontend / React:**
         ```powershell
-        Copy-Item tsconfig-fronend.json "path/to/your-project/tsconfig.json"
+        Copy-Item tsconfig-frontend.json "path/to/your-project/tsconfig.json"
         ```
 
 ### Option B: Download individually via PowerShell (inside your project folder)
@@ -137,16 +137,16 @@ If you prefer to copy or download files individually without running the automat
 $base = "https://raw.githubusercontent.com/xcfio/settings/main"
 
 # Global VS Code settings
-iwr "$base/settings.json" -OutFile "$env:APPDATA\Code\User\settings.json"
+irm "$base/settings.json" -OutFile "$env:APPDATA\Code\User\settings.json"
 
 # Project configuration files
-".prettierrc", ".gitattributes", ".gitignore", "oxlint.config.mts" | ForEach-Object { iwr "$base/$_" -OutFile $_ }
+".prettierrc", ".gitattributes", ".gitignore", "oxlint.config.mts" | ForEach-Object { irm "$base/$_" -OutFile $_ }
 New-Item -ItemType Directory -Path .vscode -Force | Out-Null
-iwr "$base/.vscode/settings.json" -OutFile .vscode/settings.json
+irm "$base/.vscode/settings.json" -OutFile .vscode/settings.json
 
 # TypeScript configuration (pick one)
-iwr "$base/tsconfig-backend.json" -OutFile tsconfig.json
-# iwr "$base/tsconfig-fronend.json" -OutFile tsconfig.json
+irm "$base/tsconfig-backend.json" -OutFile tsconfig.json
+# irm "$base/tsconfig-frontend.json" -OutFile tsconfig.json
 ```
 
 ## Uninstall (PowerShell)
@@ -154,7 +154,7 @@ iwr "$base/tsconfig-backend.json" -OutFile tsconfig.json
 Roll back settings, extensions, and project files:
 
 ```powershell
-iwr https://raw.githubusercontent.com/xcfio/settings/main/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/xcfio/settings/main/uninstall.ps1 | iex
 ```
 
 What [uninstall.ps1](./uninstall.ps1) does:
@@ -228,10 +228,10 @@ The same values are mirrored in `settings.json` under `prettier.*`.
 
 ### TypeScript
 
-| File                    | Use for                                                                                                                                   |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| `tsconfig-backend.json` | Node.js projects: `NodeNext` modules, `types: ["node"]`, `noEmit`, `strict`, `.ts` imports allowed                                        |
-| `tsconfig-fronend.json` | Browser/React projects: `esnext`, DOM libs, `react-jsx`, `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` |
+| File                     | Use for                                                                                                                                   |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `tsconfig-backend.json`  | Node.js projects: `NodeNext` modules, `types: ["node"]`, `noEmit`, `strict`, `.ts` imports allowed                                        |
+| `tsconfig-frontend.json` | Browser/React projects: `esnext`, DOM libs, `react-jsx`, `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` |
 
 Rename to `tsconfig.json` in your project.
 
@@ -277,7 +277,7 @@ Rules enforced by the configs:
 | `running scripts is disabled on this system` | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`                                                                                    |
 | `code : The term 'code' is not recognized`   | Reinstall VS Code with "Add to PATH" checked, or in VS Code run **Shell Command: Install 'code' command in PATH**. Restart the terminal. |
 | Extension install fails or is skipped        | Run `code --list-extensions` to see what installed, then retry the extension step.                                                       |
-| `iwr` returns 404                            | The default branch is not `main`. Change `$base` to the correct branch.                                                                  |
+| `irm` returns 404                            | The default branch is not `main`. Change `$base` to the correct branch.                                                                  |
 | Old settings needed back                     | Restore with `Copy-Item "$env:APPDATA\Code\User\settings.json.bak" "$env:APPDATA\Code\User\settings.json" -Force`                        |
 | Prettier not formatting on save              | Confirm **Prettier - Code formatter** is installed and set as default formatter.                                                         |
 | oxlint not running in editor                 | Confirm the **Oxc** extension is installed and `oxc.configPath` points to `oxlint.config.mts`.                                           |

@@ -7,8 +7,8 @@
 ## সূচিপত্র (Contents)
 
 - [কুইক স্টার্ট](#কুইক-স্টার্ট-powershell)
-  - [PowerShell খোলার নিয়ম](#powershell-খোলার-নিয়ম)
-  - [ইনস্টল (Install)](#ইনস্টল-install)
+    - [PowerShell খোলার নিয়ম](#powershell-খোলার-নিয়ম)
+    - [ইনস্টল (Install)](#ইনস্টল-install)
 - [ম্যানুয়াল কপি পদ্ধতি](#ম্যানুয়াল-কপি-পদ্ধতি)
 - [আনইনস্টল](#আনইনস্টল-powershell)
 - [প্রয়োজনীয় শর্তাবলী (Prerequisites)](#প্রয়োজনীয়-শর্তাবলী-prerequisites)
@@ -39,7 +39,7 @@
 আপনার প্রজেক্ট ফোল্ডারের ভেতরে রান করুন:
 
 ```powershell
-iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
 ```
 
 [install.ps1](./install.ps1) যা যা করে:
@@ -54,8 +54,8 @@ iwr https://raw.githubusercontent.com/xcfio/settings/main/install.ps1 | iex
 
 ```powershell
 $base = "https://raw.githubusercontent.com/xcfio/settings/main"
-iwr "$base/tsconfig-backend.json" -OutFile tsconfig.json
-iwr "$base/tsconfig-fronend.json" -OutFile tsconfig.json
+irm "$base/tsconfig-backend.json" -OutFile tsconfig.json
+irm "$base/tsconfig-frontend.json" -OutFile tsconfig.json
 ```
 
 অপশনাল ডেভ টুলিং:
@@ -74,61 +74,62 @@ pnpm add -D oxlint oxlint-plugin-eslint oxlint-tsgolint prettier typescript turb
 ### অপশন A: ক্লোন করা রিপোজিটরি থেকে
 
 1. **রিপোজিটরি ক্লোন করুন:**
-   ```bash
-   git clone https://github.com/xcfio/settings.git
-   cd settings
-   ```
+
+    ```bash
+    git clone https://github.com/xcfio/settings.git
+    cd settings
+    ```
 
 2. **গ্লোবাল VS Code সেটিংস কপি করুন:**
-   - **Windows (PowerShell):**
-     ```powershell
-     Copy-Item settings.json "$env:APPDATA\Code\User\settings.json" -Force
-     ```
-   - **macOS:**
-     ```bash
-     cp settings.json "$HOME/Library/Application Support/Code/User/settings.json"
-     ```
-   - **Linux:**
-     ```bash
-     cp settings.json "$HOME/.config/Code/User/settings.json"
-     ```
+    - **Windows (PowerShell):**
+        ```powershell
+        Copy-Item settings.json "$env:APPDATA\Code\User\settings.json" -Force
+        ```
+    - **macOS:**
+        ```bash
+        cp settings.json "$HOME/Library/Application Support/Code/User/settings.json"
+        ```
+    - **Linux:**
+        ```bash
+        cp settings.json "$HOME/.config/Code/User/settings.json"
+        ```
 
 3. **প্রস্তাবিত এক্সটেনশনসমূহ ইনস্টল করুন:**
-   - **PowerShell:**
-     ```powershell
-     (Get-Content extensions.json -Raw) -replace '(?m)^\s*//.*$', '' | ConvertFrom-Json |
-         Select-Object -ExpandProperty recommendations | ForEach-Object { code --install-extension $_ }
-     ```
-   - **Bash:**
-     ```bash
-     grep -o '"[^"]*"' extensions.json | grep '\.' | tr -d '"' | xargs -L 1 code --install-extension
-     ```
+    - **PowerShell:**
+        ```powershell
+        (Get-Content extensions.json -Raw) -replace '(?m)^\s*//.*$', '' | ConvertFrom-Json |
+            Select-Object -ExpandProperty recommendations | ForEach-Object { code --install-extension $_ }
+        ```
+    - **Bash:**
+        ```bash
+        grep -o '"[^"]*"' extensions.json | grep '\.' | tr -d '"' | xargs -L 1 code --install-extension
+        ```
 
 4. **আপনার প্রজেক্ট ফোল্ডারে কনফিগারেশন ফাইলগুলো কপি করুন:**
-   - **PowerShell:**
-     ```powershell
-     $target = "path/to/your-project"
-     Copy-Item .prettierrc, .gitattributes, .gitignore, oxlint.config.mts "$target/"
-     New-Item -ItemType Directory -Path "$target/.vscode" -Force | Out-Null
-     Copy-Item .vscode/settings.json "$target/.vscode/settings.json"
-     ```
-   - **Bash:**
-     ```bash
-     TARGET="path/to/your-project"
-     cp .prettierrc .gitattributes .gitignore oxlint.config.mts "$TARGET/"
-     mkdir -p "$TARGET/.vscode"
-     cp .vscode/settings.json "$TARGET/.vscode/settings.json"
-     ```
+    - **PowerShell:**
+        ```powershell
+        $target = "path/to/your-project"
+        Copy-Item .prettierrc, .gitattributes, .gitignore, oxlint.config.mts "$target/"
+        New-Item -ItemType Directory -Path "$target/.vscode" -Force | Out-Null
+        Copy-Item .vscode/settings.json "$target/.vscode/settings.json"
+        ```
+    - **Bash:**
+        ```bash
+        TARGET="path/to/your-project"
+        cp .prettierrc .gitattributes .gitignore oxlint.config.mts "$TARGET/"
+        mkdir -p "$TARGET/.vscode"
+        cp .vscode/settings.json "$TARGET/.vscode/settings.json"
+        ```
 
 5. **TypeScript টেমপ্লেট কপি করুন (যেকোনো একটি বেছে নিন):**
-   - **Backend / Node.js:**
-     ```powershell
-     Copy-Item tsconfig-backend.json "path/to/your-project/tsconfig.json"
-     ```
-   - **Frontend / React:**
-     ```powershell
-     Copy-Item tsconfig-fronend.json "path/to/your-project/tsconfig.json"
-     ```
+    - **Backend / Node.js:**
+        ```powershell
+        Copy-Item tsconfig-backend.json "path/to/your-project/tsconfig.json"
+        ```
+    - **Frontend / React:**
+        ```powershell
+        Copy-Item tsconfig-frontend.json "path/to/your-project/tsconfig.json"
+        ```
 
 ### অপশন B: PowerShell দিয়ে আলাদা আলাদা ফাইল ডাউনলোড (আপনার প্রজেক্ট ফোল্ডারের ভেতর)
 
@@ -136,16 +137,16 @@ pnpm add -D oxlint oxlint-plugin-eslint oxlint-tsgolint prettier typescript turb
 $base = "https://raw.githubusercontent.com/xcfio/settings/main"
 
 # গ্লোবাল VS Code সেটিংস
-iwr "$base/settings.json" -OutFile "$env:APPDATA\Code\User\settings.json"
+irm "$base/settings.json" -OutFile "$env:APPDATA\Code\User\settings.json"
 
 # প্রজেক্ট কনফিগারেশন ফাইলসমূহ
-".prettierrc", ".gitattributes", ".gitignore", "oxlint.config.mts" | ForEach-Object { iwr "$base/$_" -OutFile $_ }
+".prettierrc", ".gitattributes", ".gitignore", "oxlint.config.mts" | ForEach-Object { irm "$base/$_" -OutFile $_ }
 New-Item -ItemType Directory -Path .vscode -Force | Out-Null
-iwr "$base/.vscode/settings.json" -OutFile .vscode/settings.json
+irm "$base/.vscode/settings.json" -OutFile .vscode/settings.json
 
 # TypeScript কনফিগারেশন (যেকোনো একটি বেছে নিন)
-iwr "$base/tsconfig-backend.json" -OutFile tsconfig.json
-# iwr "$base/tsconfig-fronend.json" -OutFile tsconfig.json
+irm "$base/tsconfig-backend.json" -OutFile tsconfig.json
+# irm "$base/tsconfig-frontend.json" -OutFile tsconfig.json
 ```
 
 ## আনইনস্টল (PowerShell)
@@ -153,7 +154,7 @@ iwr "$base/tsconfig-backend.json" -OutFile tsconfig.json
 সেটিংস, এক্সটেনশন এবং প্রজেক্ট ফাইলগুলো রোলব্যাক বা রিমুভ করতে:
 
 ```powershell
-iwr https://raw.githubusercontent.com/xcfio/settings/main/uninstall.ps1 | iex
+irm https://raw.githubusercontent.com/xcfio/settings/main/uninstall.ps1 | iex
 ```
 
 [uninstall.ps1](./uninstall.ps1) যা যা করে:
@@ -180,9 +181,9 @@ iwr https://raw.githubusercontent.com/xcfio/settings/main/uninstall.ps1 | iex
 
 ### VS Code
 
-| ফাইল                    | উদ্দেশ্য                                                                 |
-| ----------------------- | ------------------------------------------------------------------------ |
-| `settings.json`         | পূর্ণ এডিটর সেটিংস। আপনার গ্লোবাল VS Code ইউজার সেটিংস হিসেবে ইনস্টল হয়। |
+| ফাইল                    | উদ্দেশ্য                                                                    |
+| ----------------------- | --------------------------------------------------------------------------- |
+| `settings.json`         | পূর্ণ এডিটর সেটিংস। আপনার গ্লোবাল VS Code ইউজার সেটিংস হিসেবে ইনস্টল হয়।    |
 | `extensions.json`       | প্রস্তাবিত এক্সটেনশনসমূহ। `code` CLI-র মাধ্যমে স্বয়ংক্রিয়ভাবে ইনস্টল হয়। |
 | `.vscode/settings.json` | ওয়ার্কস্পেস ওভাররাইড, যা Oxc এক্সটেনশনকে `oxlint.config.mts`-এ পয়েন্ট করে। |
 
@@ -227,19 +228,19 @@ Prettier, Oxc, Tailwind CSS, ArkDark, Error Lens, Pretty TS Errors, TypeScript N
 
 ### TypeScript
 
-| ফাইল                    | ব্যবহারের ক্ষেত্র                                                                                          |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------- |
-| `tsconfig-backend.json` | Node.js প্রজেক্ট: `NodeNext` মডিউল, `types: ["node"]`, `noEmit`, `strict`, `.ts` ইমপোর্ট অনুমোদিত          |
-| `tsconfig-fronend.json` | ব্রাউজার/React প্রজেক্ট: `esnext`, DOM লাইব্রেরি, `react-jsx`, `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` |
+| ফাইল                     | ব্যবহারের ক্ষেত্র                                                                                                                               |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `tsconfig-backend.json`  | Node.js প্রজেক্ট: `NodeNext` মডিউল, `types: ["node"]`, `noEmit`, `strict`, `.ts` ইমপোর্ট অনুমোদিত                                               |
+| `tsconfig-frontend.json` | ব্রাউজার/React প্রজেক্ট: `esnext`, DOM লাইব্রেরি, `react-jsx`, `verbatimModuleSyntax`, `noUncheckedIndexedAccess`, `exactOptionalPropertyTypes` |
 
 আপনার প্রজেক্টে ফাইলের নাম পরিবর্তন করে `tsconfig.json` রাখুন।
 
 ### Git
 
-| ফাইল             | উদ্দেশ্য                                                                            |
-| ---------------- | ----------------------------------------------------------------------------------- |
+| ফাইল             | উদ্দেশ্য                                                                               |
+| ---------------- | -------------------------------------------------------------------------------------- |
 | `.gitignore`     | Node, বিল্ড আউটপুট, env ফাইল, Next.js, Expo, Turbo, Vercel, Yarn, IDE ফাইল, লগ ইত্যাদি |
-| `.gitattributes` | GitHub ল্যাঙ্গুয়েজ পরিসংখ্যানে `.json` গণনা করে, `.xml` এবং `.html` উপেক্ষা করে    |
+| `.gitattributes` | GitHub ল্যাঙ্গুয়েজ পরিসংখ্যানে `.json` গণনা করে, `.xml` এবং `.html` উপেক্ষা করে       |
 
 ### রুট টুলিং (Root tooling)
 
@@ -271,15 +272,15 @@ Prettier, Oxc, Tailwind CSS, ArkDark, Error Lens, Pretty TS Errors, TypeScript N
 
 ## সমস্যা সমাধান (Troubleshooting)
 
-| সমস্যা                                       | সমাধান                                                                                                                                   |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| `running scripts is disabled on this system` | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` রান করুন।                                                                          |
+| সমস্যা                                       | সমাধান                                                                                                                                                  |
+| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `running scripts is disabled on this system` | `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` রান করুন।                                                                                         |
 | `code : The term 'code' is not recognized`   | "Add to PATH" সিলেক্ট করে VS Code পুনরায় ইনস্টল করুন, অথবা VS Code-এ **Shell Command: Install 'code' command in PATH** রান করে টার্মিনাল রিস্টার্ট দিন। |
-| এক্সটেনশন ইনস্টল ব্যর্থ বা স্কিপ হলে         | কি কি ইনস্টল হয়েছে দেখতে `code --list-extensions` রান করুন, এরপর এক্সটেনশন ইনস্টল ধাপটি পুনরায় চেষ্টা করুন।                              |
-| `iwr` 404 রিটার্ন করলে                       | ডিফল্ট ব্রাঞ্চ `main` নাও হতে পারে। সঠিক ব্রাঞ্চে `$base` পরিবর্তন করুন।                                                                 |
-| পুরোনো সেটিংস ফিরিয়ে আনতে হলে                | `Copy-Item "$env:APPDATA\Code\User\settings.json.bak" "$env:APPDATA\Code\User\settings.json" -Force` কমান্ড দিয়ে রিস্টোর করুন।           |
-| সেভ করার সময় Prettier কাজ না করলে            | নিশ্চিত করুন **Prettier - Code formatter** এক্সটেনশন ইনস্টল করা আছে এবং ডিফল্ট ফরম্যাটার হিসেবে সেট করা আছে।                             |
-| এডিটরে oxlint কাজ না করলে                    | নিশ্চিত করুন **Oxc** এক্সটেনশন ইনস্টল করা আছে এবং `oxc.configPath` পাথটি `oxlint.config.mts`-এ নির্দেশ করছে।                            |
+| এক্সটেনশন ইনস্টল ব্যর্থ বা স্কিপ হলে         | কি কি ইনস্টল হয়েছে দেখতে `code --list-extensions` রান করুন, এরপর এক্সটেনশন ইনস্টল ধাপটি পুনরায় চেষ্টা করুন।                                             |
+| `irm` 404 রিটার্ন করলে                       | ডিফল্ট ব্রাঞ্চ `main` নাও হতে পারে। সঠিক ব্রাঞ্চে `$base` পরিবর্তন করুন।                                                                                |
+| পুরোনো সেটিংস ফিরিয়ে আনতে হলে                | `Copy-Item "$env:APPDATA\Code\User\settings.json.bak" "$env:APPDATA\Code\User\settings.json" -Force` কমান্ড দিয়ে রিস্টোর করুন।                          |
+| সেভ করার সময় Prettier কাজ না করলে            | নিশ্চিত করুন **Prettier - Code formatter** এক্সটেনশন ইনস্টল করা আছে এবং ডিফল্ট ফরম্যাটার হিসেবে সেট করা আছে।                                            |
+| এডিটরে oxlint কাজ না করলে                    | নিশ্চিত করুন **Oxc** এক্সটেনশন ইনস্টল করা আছে এবং `oxc.configPath` পাথটি `oxlint.config.mts`-এ নির্দেশ করছে।                                            |
 
 ## লাইসেন্স (License)
 
@@ -287,7 +288,7 @@ MIT — বিস্তারিত তথ্যের জন্য [LICENSE](LI
 
 ## রিসোর্স (Resources)
 
-| রিসোর্স     | লিঙ্ক                                     |
+| রিসোর্স     | লিঙ্ক                                    |
 | ----------- | ---------------------------------------- |
 | GitHub      | https://github.com/xcfio/settings        |
 | Bug reports | https://github.com/xcfio/settings/issues |
