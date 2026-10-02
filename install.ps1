@@ -5,13 +5,24 @@
 .DESCRIPTION
     Installs global VS Code settings, recommended extensions, and essential project
     configuration files (.prettierrc, .gitattributes, .gitignore, oxlint.config.mts, .vscode/settings.json).
-    Automatically switches to PowerShell Core (pwsh) if available.
+    Supports all VS Code variants (Stable, Insiders, VSCodium, Cursor, code-oss) and both
+    user-level (default) and system-level installs. Automatically switches to PowerShell Core
+    (pwsh) if available.
 
 .PARAMETER TsConfig
     Optional TypeScript template to configure as tsconfig.json: 'none' (default), 'backend', or 'frontend'.
 
 .PARAMETER BaseUrl
     Base URL for remote configuration files. Defaults to xcfio/settings main branch.
+
+.PARAMETER Editor
+    VS Code variant to target. Choices: 'code' (default), 'code-insiders', 'codium', 'cursor', 'code-oss'.
+    The script also auto-detects the first available CLI when the specified editor is not on PATH.
+
+.PARAMETER Scope
+    Install scope for VS Code settings: 'User' (default, roaming profile / home dir) or
+    'System' (machine-wide ProgramData / /etc/vscode directory). Requires elevated privileges
+    when set to 'System'.
 
 .PARAMETER SkipSettings
     Skip updating global VS Code settings.
@@ -35,7 +46,10 @@
     .\install.ps1 -TsConfig backend
 
 .EXAMPLE
-    .\install.ps1 -SkipExtensions -Force
+    .\install.ps1 -Editor code-insiders -Scope System -Force
+
+.EXAMPLE
+    .\install.ps1 -Editor codium -SkipExtensions
 #>
 
 [CmdletBinding()]
@@ -45,6 +59,13 @@ param(
     [string]$TsConfig = "none",
 
     [string]$BaseUrl = "https://raw.githubusercontent.com/xcfio/settings/main",
+
+    [ValidateSet("code", "code-insiders", "codium", "cursor", "code-oss")]
+    [string]$Editor = "code",
+
+    [ValidateSet("User", "System", "Auto")]
+    [string]$Scope = "Auto",
+
     [switch]$SkipSettings,
     [switch]$SkipExtensions,
     [switch]$SkipConfigs,
@@ -148,38 +169,148 @@ function Get-WebContent {
     }
 }
 
-function Get-VSCodeSettingsPath {
-    if ($IsWindows -or $env:OS -eq "Windows_NT") {
-        return (Join-Path $env:APPDATA "Code\User\settings.json")
-    } elseif ($IsMacOS -or ($env:OSTYPE -match "darwin")) {
-        return (Join-Path $HOME "Library/Application Support/Code/User/settings.json")
-    } else {
-        $configDir = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { (Join-Path $HOME ".config") }
-        return (Join-Path $configDir "Code/User/settings.json")
+# Resolve the CLI command for the selected (or auto-detected) VS Code variant.
+# Returns a hashtable: @{ Cmd = <string>; Label = <string> }
+function Resolve-VSCodeCLI {
+    param([string]$PreferredEditor)
+
+    # Ordered candidate list per variant (CLI name -> human label)
+    $variantMap = [ordered]@{
+        "code"          = @{ Cmds = @("code");          Label = "VS Code Stable"   }
+        "code-insiders" = @{ Cmds = @("code-insiders"); Label = "VS Code Insiders" }
+        "codium"        = @{ Cmds = @("codium");        Label = "VSCodium"         }
+        "cursor"        = @{ Cmds = @("cursor");        Label = "Cursor"           }
+        "code-oss"      = @{ Cmds = @("code-oss");      Label = "Code OSS"         }
     }
+
+    # Try the preferred editor first
+    $entry = $variantMap[$PreferredEditor]
+    if ($entry) {
+        foreach ($cmd in $entry.Cmds) {
+            $found = Get-Command $cmd -ErrorAction SilentlyContinue
+            if ($found) { return @{ Cmd = $cmd; Label = $entry.Label } }
+        }
+    }
+
+    # Fall back: try every other variant in order
+    foreach ($key in $variantMap.Keys) {
+        if ($key -eq $PreferredEditor) { continue }
+        $fb = $variantMap[$key]
+        foreach ($cmd in $fb.Cmds) {
+            $found = Get-Command $cmd -ErrorAction SilentlyContinue
+            if ($found) { return @{ Cmd = $cmd; Label = $fb.Label } }
+        }
+    }
+
+    return $null
+}
+
+# Resolve the settings.json path for the given editor variant and scope.
+# Scope 'User'   -> per-user roaming/home config dir
+# Scope 'System' -> machine-wide config dir (requires admin on Windows)
+# Scope 'Auto'   -> probes System then User; returns the first path that exists,
+#                   falling back to the User path if neither is found yet.
+function Get-VSCodeSettingsPath {
+    param(
+        [string]$EditorVariant = "code",
+        [string]$InstallScope  = "Auto"
+    )
+
+    # Map variant -> subdirectory name used inside the config root
+    $dirMap = @{
+        "code"          = "Code"
+        "code-insiders" = "Code - Insiders"
+        "codium"        = "VSCodium"
+        "cursor"        = "Cursor"
+        "code-oss"      = "code-oss"
+    }
+    $dirName = if ($dirMap.ContainsKey($EditorVariant)) { $dirMap[$EditorVariant] } else { "Code" }
+
+    # Build the concrete path for a given explicit scope
+    function Resolve-ScopedPath([string]$Scope) {
+        if ($IsWindows -or $env:OS -eq "Windows_NT") {
+            if ($Scope -eq "System") {
+                return (Join-Path $env:ProgramData "$dirName\User\settings.json")
+            } else {
+                return (Join-Path $env:APPDATA "$dirName\User\settings.json")
+            }
+        } elseif ($IsMacOS -or ($env:OSTYPE -match "darwin")) {
+            if ($Scope -eq "System") {
+                return "/Library/Application Support/$dirName/User/settings.json"
+            } else {
+                return (Join-Path $HOME "Library/Application Support/$dirName/User/settings.json")
+            }
+        } else {
+            # Linux / WSL
+            if ($Scope -eq "System") {
+                return "/etc/vscode/$dirName/settings.json"
+            } else {
+                $configDir = if ($env:XDG_CONFIG_HOME) { $env:XDG_CONFIG_HOME } else { (Join-Path $HOME ".config") }
+                return (Join-Path $configDir "$dirName/User/settings.json")
+            }
+        }
+    }
+
+    if ($InstallScope -eq "Auto") {
+        # Probe System first, then User; return whichever settings.json already exists.
+        # If neither exists yet, fall back to the User path (install will create it).
+        $systemPath = Resolve-ScopedPath "System"
+        $userPath   = Resolve-ScopedPath "User"
+        if (Test-Path $systemPath) { return $systemPath }
+        if (Test-Path $userPath)   { return $userPath   }
+        return $userPath
+    }
+
+    return (Resolve-ScopedPath $InstallScope)
 }
 
 # -------------------------------------------------------------------------
 # Banner
 # -------------------------------------------------------------------------
 $shellInfo = "PowerShell $($PSVersionTable.PSVersion) ($($PSVersionTable.PSEdition))"
-$targetOs = if ($IsWindows -or $env:OS -eq "Windows_NT") { "Windows" } elseif ($IsMacOS) { "macOS" } else { "Linux" }
+$targetOs  = if ($IsWindows -or $env:OS -eq "Windows_NT") { "Windows" } elseif ($IsMacOS) { "macOS" } else { "Linux" }
+
+# Map variant to display label (before CLI resolution)
+$editorLabelMap = @{
+    "code"          = "VS Code Stable"
+    "code-insiders" = "VS Code Insiders"
+    "codium"        = "VSCodium"
+    "cursor"        = "Cursor"
+    "code-oss"      = "Code OSS"
+}
+$editorLabel = if ($editorLabelMap.ContainsKey($Editor)) { $editorLabelMap[$Editor] } else { $Editor }
 
 Write-Host ""
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host "  Dev Environment Setup (xcfio/settings)" -ForegroundColor Cyan
-Write-Host "  Shell : $shellInfo" -ForegroundColor DarkGray
-Write-Host "  OS    : $targetOs" -ForegroundColor DarkGray
+Write-Host "  Shell  : $shellInfo" -ForegroundColor DarkGray
+Write-Host "  OS     : $targetOs" -ForegroundColor DarkGray
+Write-Host "  Editor : $editorLabel" -ForegroundColor DarkGray
+Write-Host "  Scope  : $(if ($Scope -eq 'Auto') { 'Auto (System → User)' } else { $Scope })" -ForegroundColor DarkGray
 Write-Host "==========================================================" -ForegroundColor Cyan
 Write-Host ""
+
+# Warn early when system scope may be involved without elevation (Windows)
+$mightUseSystem = ($Scope -eq "System") -or ($Scope -eq "Auto")
+if ($mightUseSystem -and ($IsWindows -or $env:OS -eq "Windows_NT")) {
+    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole(
+        [Security.Principal.WindowsBuiltInRole]::Administrator
+    )
+    if (-not $isAdmin -and $Scope -eq "System") {
+        Write-Host "[!] WARNING: '-Scope System' requires Administrator privileges on Windows." -ForegroundColor Yellow
+        Write-Host "    Settings may fail to write. Re-run as Administrator for system-wide install." -ForegroundColor DarkGray
+        Write-Host ""
+    }
+}
+
 
 # -------------------------------------------------------------------------
 # Step 1: Global VS Code Settings
 # -------------------------------------------------------------------------
 if (-not $SkipSettings) {
     Write-Host "[1/4] Global VS Code Settings" -ForegroundColor Cyan
-    $settingsPath = Get-VSCodeSettingsPath
-    $settingsDir = Split-Path -Parent $settingsPath
+    $settingsPath = Get-VSCodeSettingsPath -EditorVariant $Editor -InstallScope $Scope
+    $settingsDir  = Split-Path -Parent $settingsPath
 
     try {
         if (-not (Test-Path $settingsDir)) {
@@ -206,31 +337,42 @@ if (-not $SkipSettings) {
 # -------------------------------------------------------------------------
 if (-not $SkipExtensions) {
     Write-Host "`n[2/4] VS Code Extensions" -ForegroundColor Cyan
-    $codeCmd = Get-Command code -ErrorAction SilentlyContinue
 
-    if (-not $codeCmd) {
-        Write-Host "  [!] VS Code CLI ('code') not found on PATH. Skipping extensions." -ForegroundColor Yellow
+    $cliInfo = Resolve-VSCodeCLI -PreferredEditor $Editor
+
+    if (-not $cliInfo) {
+        Write-Host "  [!] No VS Code CLI found on PATH. Searched: code, code-insiders, codium, cursor, code-oss." -ForegroundColor Yellow
         Write-Host "      Tip: Open VS Code > Ctrl+Shift+P > 'Shell Command: Install ''code'' command in PATH'" -ForegroundColor DarkGray
     } else {
+        $codeCmd  = $cliInfo.Cmd
+        $codeLabel = $cliInfo.Label
+
+        # Warn if a fallback was used
+        if ($codeCmd -ne $Editor) {
+            Write-Host "  [!] '$Editor' not found; using '$codeCmd' ($codeLabel) instead." -ForegroundColor Yellow
+        } else {
+            Write-Host "  [i] Using CLI: $codeCmd ($codeLabel)" -ForegroundColor DarkGray
+        }
+
         try {
-            $extUrl = "$BaseUrl/extensions.json"
+            $extUrl  = "$BaseUrl/extensions.json"
             $rawJson = Get-WebContent -Url $extUrl
-            # Strip comments
-            $cleanJson = $rawJson -replace '(?m)^\s*//.*$', '' -replace '(?m)\s*//.*$', ''
+            # Strip JS-style comments before parsing
+            $cleanJson      = $rawJson -replace '(?m)^\s*//.*$', '' -replace '(?m)\s*//.*$', ''
             $recommendations = ($cleanJson | ConvertFrom-Json).recommendations
 
             if ($recommendations -and $recommendations.Count -gt 0) {
                 # Read currently installed extensions
-                $installedExtensions = @(& code --list-extensions 2>$null)
+                $installedExtensions = @(& $codeCmd --list-extensions 2>$null)
                 $installedSet = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
                 foreach ($item in $installedExtensions) {
                     if ($item -and $item.Trim()) { [void]$installedSet.Add($item.Trim()) }
                 }
 
-                $total = $recommendations.Count
-                $curr = 0
+                $total         = $recommendations.Count
+                $curr          = 0
                 $installedCount = 0
-                $skippedCount = 0
+                $skippedCount  = 0
 
                 foreach ($ext in $recommendations) {
                     $curr++
@@ -242,7 +384,7 @@ if (-not $SkipExtensions) {
                         $skippedCount++
                     } else {
                         Write-Host "  [$curr/$total] [+] Installing $extName..." -ForegroundColor Cyan
-                        & code --install-extension $extName --force | Out-Null
+                        & $codeCmd --install-extension $extName --force | Out-Null
                         if ($LASTEXITCODE -eq 0) {
                             Write-Host "  [$curr/$total] [v] Installed: $extName" -ForegroundColor Green
                             $installedCount++
@@ -284,7 +426,7 @@ if (-not $SkipConfigs) {
     }
 
     # Workspace .vscode/settings.json override (points Oxc extension to oxlint.config.mts)
-    $vscodeWorkspaceDir = Join-Path (Get-Location) ".vscode"
+    $vscodeWorkspaceDir      = Join-Path (Get-Location) ".vscode"
     $vscodeWorkspaceSettings = Join-Path $vscodeWorkspaceDir "settings.json"
 
     try {
@@ -295,12 +437,12 @@ if (-not $SkipConfigs) {
         if (Test-Path $vscodeWorkspaceSettings) {
             # Preserve existing workspace settings while ensuring oxc.configPath is configured
             try {
-                $existingContent = Get-Content $vscodeWorkspaceSettings -Raw
+                $existingContent    = Get-Content $vscodeWorkspaceSettings -Raw
                 $cleanWorkspaceJson = $existingContent -replace '(?m)^\s*//.*$', '' -replace '(?m)\s*//.*$', ''
-                $workspaceObj = $cleanWorkspaceJson | ConvertFrom-Json
+                $workspaceObj       = $cleanWorkspaceJson | ConvertFrom-Json
                 $workspaceObj | Add-Member -NotePropertyName "oxc.configPath" -NotePropertyValue "oxlint.config.mts" -Force
                 $updatedJson = $workspaceObj | ConvertTo-Json -Depth 10
-                $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+                $utf8NoBom   = [System.Text.UTF8Encoding]::new($false)
                 [System.IO.File]::WriteAllText($vscodeWorkspaceSettings, $updatedJson + "`n", $utf8NoBom)
                 Write-Host "  [+] Configured oxc.configPath in existing .vscode/settings.json" -ForegroundColor Green
             } catch {

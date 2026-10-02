@@ -1,4 +1,4 @@
-# Settings
+﻿# Settings
 
 [English](README.md) | [বাংলা](README.bn.md)
 
