@@ -357,8 +357,9 @@ if (-not $SkipExtensions) {
         try {
             $extUrl  = "$BaseUrl/extensions.json"
             $rawJson = Get-WebContent -Url $extUrl
-            # Strip JS-style comments before parsing
-            $cleanJson      = $rawJson -replace '(?m)^\s*//.*$', ''
+            # Strip UTF-8 BOM (U+FEFF) and JS-style comments before parsing
+            $rawJson         = $rawJson.TrimStart([char]0xFEFF)
+            $cleanJson       = $rawJson -replace '(?m)^\s*//.*$', ''
             $recommendations = ($cleanJson | ConvertFrom-Json).recommendations
 
             if ($recommendations -and $recommendations.Count -gt 0) {

@@ -333,6 +333,8 @@ if (-not $SkipExtensions) {
                 $rawJson = Get-WebContent -Url "$BaseUrl/extensions.json"
             }
 
+            # Strip UTF-8 BOM (U+FEFF) and JS-style comments before parsing
+            $rawJson         = $rawJson.TrimStart([char]0xFEFF)
             $cleanJson       = $rawJson -replace '(?m)^\s*//.*$', ''
             $recommendations = ($cleanJson | ConvertFrom-Json).recommendations
 
@@ -435,6 +437,7 @@ if (-not $SkipConfigs) {
         } elseif (Test-Path $vscodeSettings) {
             try {
                 $content = Get-Content $vscodeSettings -Raw
+                $content = $content.TrimStart([char]0xFEFF)
                 $clean   = $content -replace '(?m)^\s*//.*$', ''
                 $obj     = $clean | ConvertFrom-Json
                 if ($obj.PSObject.Properties['oxc.configPath']) {
