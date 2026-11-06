@@ -308,7 +308,7 @@ if ($mightUseSystem -and ($IsWindows -or $env:OS -eq "Windows_NT")) {
 # Step 1: Global VS Code Settings
 # -------------------------------------------------------------------------
 if (-not $SkipSettings) {
-    Write-Host "[1/4] Global VS Code Settings" -ForegroundColor Cyan
+    Write-Host "[1/2] Global VS Code Settings" -ForegroundColor Cyan
     $settingsPath = Get-VSCodeSettingsPath -EditorVariant $Editor -InstallScope $Scope
     $settingsDir  = Split-Path -Parent $settingsPath
 
@@ -329,14 +329,14 @@ if (-not $SkipSettings) {
         Write-Host "  [x] Failed to install VS Code settings: $_" -ForegroundColor Red
     }
 } else {
-    Write-Host "[1/4] Global VS Code Settings: SKIPPED (-SkipSettings)" -ForegroundColor DarkGray
+    Write-Host "[1/2] Global VS Code Settings: SKIPPED (-SkipSettings)" -ForegroundColor DarkGray
 }
 
 # -------------------------------------------------------------------------
 # Step 2: VS Code Extensions
 # -------------------------------------------------------------------------
 if (-not $SkipExtensions) {
-    Write-Host "`n[2/4] VS Code Extensions" -ForegroundColor Cyan
+    Write-Host "`n[2/2] VS Code Extensions" -ForegroundColor Cyan
 
     $cliInfo = Resolve-VSCodeCLI -PreferredEditor $Editor
 
@@ -401,98 +401,7 @@ if (-not $SkipExtensions) {
         }
     }
 } else {
-    Write-Host "`n[2/4] VS Code Extensions: SKIPPED (-SkipExtensions)" -ForegroundColor DarkGray
-}
-
-# -------------------------------------------------------------------------
-# Step 3: Project Configuration Files (Current Directory)
-# -------------------------------------------------------------------------
-if (-not $SkipConfigs) {
-    Write-Host "`n[3/4] Project Configuration Files" -ForegroundColor Cyan
-    $projectFiles = @(
-        ".prettierrc",
-        ".gitattributes",
-        ".gitignore",
-        "oxlint.config.mts"
-    )
-
-    foreach ($file in $projectFiles) {
-        $dest = Join-Path (Get-Location) $file
-        try {
-            Download-File -Url "$BaseUrl/$file" -OutPath $dest
-            Write-Host "  [+] Downloaded: $file" -ForegroundColor Green
-        } catch {
-            Write-Host "  [x] Failed to download $file : $_" -ForegroundColor Red
-        }
-    }
-
-    # Workspace .vscode/settings.json override (points Oxc extension to oxlint.config.mts)
-    $vscodeWorkspaceDir      = Join-Path (Get-Location) ".vscode"
-    $vscodeWorkspaceSettings = Join-Path $vscodeWorkspaceDir "settings.json"
-
-    try {
-        if (-not (Test-Path $vscodeWorkspaceDir)) {
-            New-Item -ItemType Directory -Path $vscodeWorkspaceDir -Force | Out-Null
-        }
-
-        if (Test-Path $vscodeWorkspaceSettings) {
-            # Preserve existing workspace settings while ensuring oxc.configPath is configured
-            try {
-                $existingContent    = Get-Content $vscodeWorkspaceSettings -Raw
-                $cleanWorkspaceJson = $existingContent -replace '(?m)^\s*//.*$', '' -replace '(?m)\s*//.*$', ''
-                $workspaceObj       = $cleanWorkspaceJson | ConvertFrom-Json
-                $workspaceObj | Add-Member -NotePropertyName "oxc.configPath" -NotePropertyValue "oxlint.config.mts" -Force
-                $updatedJson = $workspaceObj | ConvertTo-Json -Depth 10
-                $utf8NoBom   = [System.Text.UTF8Encoding]::new($false)
-                [System.IO.File]::WriteAllText($vscodeWorkspaceSettings, $updatedJson + "`n", $utf8NoBom)
-                Write-Host "  [+] Configured oxc.configPath in existing .vscode/settings.json" -ForegroundColor Green
-            } catch {
-                # Fallback to direct download
-                Download-File -Url "$BaseUrl/.vscode/settings.json" -OutPath $vscodeWorkspaceSettings
-                Write-Host "  [+] Downloaded: .vscode/settings.json" -ForegroundColor Green
-            }
-        } else {
-            Download-File -Url "$BaseUrl/.vscode/settings.json" -OutPath $vscodeWorkspaceSettings
-            Write-Host "  [+] Downloaded: .vscode/settings.json" -ForegroundColor Green
-        }
-    } catch {
-        Write-Host "  [x] Failed to configure .vscode/settings.json: $_" -ForegroundColor Red
-    }
-} else {
-    Write-Host "`n[3/4] Project Configuration Files: SKIPPED (-SkipConfigs)" -ForegroundColor DarkGray
-}
-
-# -------------------------------------------------------------------------
-# Step 4: Optional TypeScript Configuration
-# -------------------------------------------------------------------------
-Write-Host "`n[4/4] TypeScript Configuration" -ForegroundColor Cyan
-$tsconfigDest = Join-Path (Get-Location) "tsconfig.json"
-
-if ($TsConfig -eq "backend") {
-    try {
-        if (Test-Path $tsconfigDest) {
-            Copy-Item -Path $tsconfigDest -Destination "$tsconfigDest.bak" -Force
-            Write-Host "  [+] Backed up existing tsconfig.json to tsconfig.json.bak" -ForegroundColor DarkGray
-        }
-        Download-File -Url "$BaseUrl/tsconfig-backend.json" -OutPath $tsconfigDest
-        Write-Host "  [+] Configured TypeScript backend (Node.js/NodeNext): tsconfig.json" -ForegroundColor Green
-    } catch {
-        Write-Host "  [x] Failed to download backend tsconfig: $_" -ForegroundColor Red
-    }
-} elseif ($TsConfig -eq "frontend") {
-    try {
-        if (Test-Path $tsconfigDest) {
-            Copy-Item -Path $tsconfigDest -Destination "$tsconfigDest.bak" -Force
-            Write-Host "  [+] Backed up existing tsconfig.json to tsconfig.json.bak" -ForegroundColor DarkGray
-        }
-        Download-File -Url "$BaseUrl/tsconfig-frontend.json" -OutPath $tsconfigDest
-        Write-Host "  [+] Configured TypeScript frontend (React/DOM): tsconfig.json" -ForegroundColor Green
-    } catch {
-        Write-Host "  [x] Failed to download frontend tsconfig: $_" -ForegroundColor Red
-    }
-} else {
-    Write-Host "  [-] No tsconfig template selected." -ForegroundColor DarkGray
-    Write-Host "      Tip: Re-run with '-TsConfig backend' or '-TsConfig frontend' to install tsconfig.json" -ForegroundColor DarkGray
+    Write-Host "`n[2/2] VS Code Extensions: SKIPPED (-SkipExtensions)" -ForegroundColor DarkGray
 }
 
 # -------------------------------------------------------------------------
@@ -503,11 +412,7 @@ Write-Host "==========================================================" -Foregro
 Write-Host "  Setup completed successfully!" -ForegroundColor Green
 Write-Host "==========================================================" -ForegroundColor Green
 Write-Host ""
-Write-Host "Next steps for your project:" -ForegroundColor Cyan
-Write-Host "  1. Install recommended dev dependencies with pnpm:" -ForegroundColor White
-Write-Host "     pnpm add -D oxlint oxlint-plugin-eslint oxlint-tsgolint prettier typescript turbo lefthook commitlint @commitlint/config-conventional @commitlint/format @commitlint/types" -ForegroundColor Yellow
-Write-Host ""
-Write-Host "  2. Remember to run project scripts via node:" -ForegroundColor White
+Write-Host "  Remember to run project scripts via node:" -ForegroundColor White
 Write-Host "     node --run dev" -ForegroundColor Yellow
 Write-Host "     node --run lint" -ForegroundColor Yellow
 Write-Host "     node --run test" -ForegroundColor Yellow
