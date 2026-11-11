@@ -4,16 +4,17 @@
 
     "recommendations": [
         "bradlc.vscode-tailwindcss",
-        "drewxs.tokyo-night-dark",
+        "leonardssh.vscord",
         "esbenp.prettier-vscode",
         "formulahendry.code-runner",
-        "github.github-vscode-theme",
         "meganrogge.template-string-converter",
         "miguelsolorio.symbols",
         "oxc.oxc-vscode",
         "streetsidesoftware.code-spell-checker",
         "typescriptteam.native-preview",
         "usernamehw.errorlens",
-        "yoavbls.pretty-ts-errors"
+        "yoavbls.pretty-ts-errors",
+        "drewxs.tokyo-night-dark",
+        "github.github-vscode-theme"
     ]
 }
